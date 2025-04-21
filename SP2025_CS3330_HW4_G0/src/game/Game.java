@@ -55,14 +55,15 @@ public class Game {
 				
 			}
 			
+			//Sets one of the leftmost cells' left value to EXIT
 			columns[0].getCellAtIndex(random.nextInt(gridSize)).setLeft(CellComponents.EXIT);
 		}
 		
-		
+		//Returns the grid
 		Grid grid = new Grid(columns);
 		return grid;
 	}
-
+	
 	public Grid getGrid() {
 		return grid;
 	}
