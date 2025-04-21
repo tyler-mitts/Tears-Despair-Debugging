@@ -1,4 +1,4 @@
-package hw4.maze.test;
+package maze.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
