@@ -2,10 +2,10 @@ package hw4.game;
 
 import java.util.Random;
 
-import maze.Cell;
-import maze.CellComponents;
-import maze.Grid;
-import maze.Row;
+import hw4.maze.Cell;
+import hw4.maze.CellComponents;
+import hw4.maze.Grid;
+import hw4.maze.Row;
 
 public class Game {
 	private Grid grid;
