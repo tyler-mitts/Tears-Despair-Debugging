@@ -1,4 +1,4 @@
-package maze.test;
+package hw4.maze.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

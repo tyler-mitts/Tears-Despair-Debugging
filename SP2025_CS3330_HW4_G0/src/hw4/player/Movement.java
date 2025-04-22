@@ -1,4 +1,4 @@
-package player;
+package hw4.player;
 
 /**
  * Represents the possible movement directions for the player in the maze.

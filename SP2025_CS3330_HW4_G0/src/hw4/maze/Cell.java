@@ -1,4 +1,4 @@
-package maze;
+package hw4.maze;
 
 /**
  * Represents a cell in the maze grid.

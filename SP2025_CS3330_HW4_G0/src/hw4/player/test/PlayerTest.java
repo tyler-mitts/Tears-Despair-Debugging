@@ -1,4 +1,4 @@
-package maze.test;
+package hw4.player.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,15 +14,18 @@ import hw4.maze.Cell;
 import hw4.maze.CellComponents;
 import hw4.maze.Grid;
 import hw4.maze.Row;
+import hw4.player.Player;
 
-class GridTest {
-
+class PlayerTest {
+	
 	private static Grid grid;
-
-	private static ArrayList<Row> rowList;
+	protected static Player player;
+	
+	private Cell currentCell;
+	private Row currentRow;
 
 	@BeforeAll
-	public static void setUpBeforeClass() throws Exception {
+	static void setUpBeforeClass() throws Exception {
 		Cell cell00 = new Cell(CellComponents.EXIT, CellComponents.APERTURE,
 				CellComponents.WALL, CellComponents.APERTURE);
 		
@@ -73,9 +76,10 @@ class GridTest {
 		rows.add(0, row0);
 		rows.add(1, row1);
 		rows.add(2, row2);
-		rowList = new ArrayList<>();
-		rowList = rows;
+		new ArrayList<>();
 		grid = new Grid(rows);
+		player = new Player(grid.getRows().get(2), 
+							grid.getRows().get(2).getCells().get(2));
 	}
 
 	@AfterAll
@@ -84,6 +88,8 @@ class GridTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
+		currentRow = grid.getRows().get(2);
+		currentCell = grid.getRows().get(2).getCells().get(2);
 	}
 
 	@AfterEach
@@ -91,33 +97,18 @@ class GridTest {
 	}
 
 	@Test
-	void testGetGrid() {
-		assertEquals(rowList, grid.getRows());
+	public void testGetCurrentRow() {
+		assertEquals(currentRow, player.getCurrentRow());		
 	}
 	
 	@Test
-	void testSetGrid() {
-		grid.setRows(null);
-		assertEquals(null, grid.getRows());
+	public void testGetCurrentCell() {		
+		assertEquals(currentCell, player.getCurrentCell());
 	}
 	
-	@Test 
-	void testToString() {
-		
-		assertEquals("Grid [rows=["
-				+ "Row [cells=["
-					+ "Cell [left=EXIT, right=APERTURE, up=WALL, down=APERTURE], "
-					+ "Cell [left=APERTURE, right=WALL, up=WALL, down=APERTURE], "
-					+ "Cell [left=WALL, right=WALL, up=WALL, down=APERTURE]]], "
-				+ "Row [cells=["
-					+ "Cell [left=WALL, right=WALL, up=APERTURE, down=APERTURE], "
-					+ "Cell [left=WALL, right=APERTURE, up=APERTURE, down=APERTURE], "
-					+ "Cell [left=APERTURE, right=WALL, up=APERTURE, down=APERTURE]]], "
-				+ "Row [cells=["
-					+ "Cell [left=WALL, right=WALL, up=APERTURE, down=WALL], "
-					+ "Cell [left=WALL, right=WALL, up=APERTURE, down=WALL], "
-					+ "Cell [left=WALL, right=WALL, up=APERTURE, down=WALL]]]]]", grid.toString());
-		
+	@Test
+	public void testToString() {
+		assertEquals("Player [currentCell=" + currentCell + ", currentRow=" + currentRow + "]", player.toString());
 	}
 
 }

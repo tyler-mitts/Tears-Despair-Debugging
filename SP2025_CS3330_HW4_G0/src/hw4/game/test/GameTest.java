@@ -1,4 +1,4 @@
-package game.test;
+package hw4.game.test;
 import static org.junit.jupiter.api.Assertions.*;
 
 
