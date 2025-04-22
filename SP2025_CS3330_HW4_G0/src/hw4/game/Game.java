@@ -237,4 +237,38 @@ public class Game {
     public String toString() {
         return "Game [grid=" + grid + "]";
     }
+    
+    /**
+     * Prints the current state of the grid with the player's position.
+     * @param player The player to display on the grid
+     */
+    public void printGrid(Player player) {
+    	int gridSize = grid.getRows().size();
+    	
+    	char[][] displayGrid = new char[gridSize][gridSize];
+    	
+    	for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                displayGrid[i][j] = 'S';
+            }
+        }
+    	
+    	for (int i = 0; i < gridSize; i++) {
+            if (grid.getRows().get(i).getCells().get(0).getLeft() == CellComponents.EXIT) {
+                displayGrid[i][0] = 'E';
+            }
+        }
+    	
+    	int playerRowIndex = grid.getRows().indexOf(player.getCurrentRow());
+        int playerCellIndex = player.getCurrentRow().getCells().indexOf(player.getCurrentCell());
+        displayGrid[playerRowIndex][playerCellIndex] = 'A';
+        
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                System.out.print(displayGrid[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
 }
