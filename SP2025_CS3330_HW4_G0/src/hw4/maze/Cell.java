@@ -25,7 +25,10 @@ public class Cell {
      * Default constructor that creates an empty cell.
      */
 	public Cell() {
-		
+		this.left = CellComponents.WALL;
+        this.right = CellComponents.WALL;
+        this.up = CellComponents.WALL;
+        this.down = CellComponents.WALL;
 	}
 	
 	/**
@@ -41,7 +44,11 @@ public class Cell {
      * @param left The left component to set
      */
 	public void setLeft(CellComponents left) {
-		this.left = left;
+		if (left == null ) {
+			this.left = CellComponents.WALL;
+		} else {
+			this.left = left;
+		}
 	}
 
 	/**
@@ -57,7 +64,11 @@ public class Cell {
      * @param right The right component to set
      */
 	public void setRight(CellComponents right) {
-		this.right = right;
+		if (right == null ) {
+			this.right = CellComponents.WALL;
+		} else {
+			this.right = right;
+		}
 	}
 
 	/**
@@ -73,7 +84,11 @@ public class Cell {
      * @param up The upper component to set
      */
 	public void setUp(CellComponents up) {
-		this.up = up;
+		if (up == null ) {
+			this.up = CellComponents.WALL;
+		} else {
+			this.up = up;
+		}
 	}
 
 	/**
@@ -89,7 +104,11 @@ public class Cell {
      * @param down The lower component to set
      */
 	public void setDown(CellComponents down) {
-		this.down = down;
+		if (down == null ) {
+			this.down = CellComponents.WALL;
+		} else {
+			this.down = down;
+		}
 	}
 
 	/**
