@@ -7,6 +7,8 @@ import hw4.maze.Cell;
 import hw4.maze.CellComponents;
 import hw4.maze.Grid;
 import hw4.maze.Row;
+import hw4.player.Player;
+import hw4.player.Movement;
 
 /**
  * Represents the game with maze grid and player movement.
@@ -135,11 +137,104 @@ public class Game {
 		return new Grid(rows);
 	}
 	
+	/**
+	 * Handles player movement in the maze.
+	 * @param movement The direction of movement
+	 * @param player The player to move
+	 * @return True if the movement is valid and successful, false otherwise
+	 */
+	public boolean play(Movement movement, Player player) {
+		if (movement == null || player == null) {
+			return false;
+		}
+		
+		Cell currentCell = player.getCurrentCell();
+		Row currentRow = player.getCurrentRow();
+		
+		int rowIndex = grid.getRows().indexOf(currentRow);
+		if (rowIndex == -1) {
+			return false;
+		}
+		
+		int cellIndex = currentRow.getCells().indexOf(currentCell);
+		if (cellIndex == -1) {
+			return false;
+		}
+		
+		switch (movement) {
+			case UP:
+				if (currentCell.getUp() == CellComponents.APERTURE && rowIndex > 0) {
+                    // Move the player up one row
+                    Row upRow = grid.getRows().get(rowIndex - 1);
+                    Cell upCell = upRow.getCells().get(cellIndex);
+                    player.setCurrentRow(upRow);
+                    player.setCurrentCell(upCell);
+                    return true;
+                }
+                break;
+                
+			case DOWN:
+                // Check if we can move down
+                if (currentCell.getDown() == CellComponents.APERTURE && rowIndex < grid.getRows().size() - 1) {
+                    // Move the player down one row
+                    Row downRow = grid.getRows().get(rowIndex + 1);
+                    Cell downCell = downRow.getCells().get(cellIndex);
+                    player.setCurrentRow(downRow);
+                    player.setCurrentCell(downCell);
+                    return true;
+                }
+                break;
+                
+			case LEFT:
+                // Check if we can move left
+                if (currentCell.getLeft() == CellComponents.APERTURE && cellIndex > 0) {
+                    // Move the player left one cell
+                    Cell leftCell = currentRow.getCells().get(cellIndex - 1);
+                    player.setCurrentCell(leftCell);
+                    return true;
+                } else if (currentCell.getLeft() == CellComponents.EXIT && cellIndex == 0) {
+                    // Player has reached the exit
+                    System.out.println("Player has escaped the maze!");
+                    return true;
+                }
+                break;
+                
+            case RIGHT:
+                // Check if we can move right
+                if (currentCell.getRight() == CellComponents.APERTURE && cellIndex < currentRow.getCells().size() - 1) {
+                    // Move the player right one cell
+                    Cell rightCell = currentRow.getCells().get(cellIndex + 1);
+                    player.setCurrentCell(rightCell);
+                    return true;
+                }
+                break;
+		}
+		
+		return false;
+	}
+	
+	/**
+     * Gets the grid of the game.
+     * @return The grid
+     */
 	public Grid getGrid() {
 		return grid;
 	}
 
+	/**
+     * Sets the grid of the game.
+     * @param grid The new grid
+     */
 	public void setGrid(Grid grid) {
 		this.grid = grid;
 	}
+	
+	/**
+     * Returns a string representation of the game.
+     * @return String representation of the game's grid
+     */
+    @Override
+    public String toString() {
+        return "Game [grid=" + grid + "]";
+    }
 }
