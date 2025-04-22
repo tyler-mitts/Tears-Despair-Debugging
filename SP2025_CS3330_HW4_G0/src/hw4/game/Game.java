@@ -68,66 +68,173 @@ public class Game {
 	    	for (int j = 0; j < gridSize; j++) {
 	    		Cell currentCell = rows.get(i).getCellAtIndex(j);
 	    		
-	    		// If not in the first row, share UP component with the cell above
-	            if (i > 0) {
-	                currentCell.setUp(rows.get(i-1).getCellAtIndex(j).getDown());
+	    		// Set top edge to WALL
+	            if (i == 0) {
+	                currentCell.setUp(CellComponents.WALL);
 	            } else {
-	                // For first row cells, randomly assign UP component
-	                currentCell.setUp(random.nextInt(2) == 0 ? CellComponents.WALL : CellComponents.APERTURE);
+	                // Get component from the cell above
+	                currentCell.setUp(rows.get(i-1).getCellAtIndex(j).getDown());
 	            }
 	            
-                // For all cells, randomly assign DOWN component
-                currentCell.setDown(random.nextInt(2) == 0 ? CellComponents.WALL : CellComponents.APERTURE);
+	            // Set bottom edge to WALL
+	            if (i == gridSize - 1) {
+	                currentCell.setDown(CellComponents.WALL);
+	            } else {
+	                // Randomly set DOWN (will be shared with cell below)
+	                currentCell.setDown(random.nextInt(2) == 0 ? CellComponents.WALL : CellComponents.APERTURE);
+	            }
+	            
+	            // Set left edge to WALL (except for the EXIT)
+	            if (j == 0) {
+	                // Initially all left edges are WALL (we'll set one to EXIT later)
+	                currentCell.setLeft(CellComponents.WALL);
+	            } else {
+	                // Get component from the cell to the left
+	                currentCell.setLeft(rows.get(i).getCellAtIndex(j-1).getRight());
+	            }
                 
-                // If not in the first column, share LEFT component with the cell to the left
-                if (j > 0) {
-                    currentCell.setLeft(rows.get(i).getCellAtIndex(j-1).getRight());
-                } else {
-                    // For first column cells (leftmost), randomly assign LEFT component
-                    currentCell.setLeft(random.nextInt(2) == 0 ? CellComponents.WALL : CellComponents.APERTURE);
-                }
-                
-                // For all cells, randomly assign RIGHT component
-                currentCell.setRight(random.nextInt(2) == 0 ? CellComponents.WALL : CellComponents.APERTURE);
-
-             // Ensure each cell has at least one APERTURE
-                if (currentCell.getLeft() == CellComponents.WALL &&
-                    currentCell.getRight() == CellComponents.WALL &&
-                    currentCell.getUp() == CellComponents.WALL &&
-                    currentCell.getDown() == CellComponents.WALL) {
-                    
-                    // Find components that can be changed to APERTURE without breaking consistency
-                    ArrayList<Integer> changeable = new ArrayList<>();
-                    
-                    // Left side can be changed if it's the first column
-                    if (j == 0) changeable.add(0);
-                    // Right side can be changed if it's the last column
-                    if (j == gridSize - 1) changeable.add(1);
-                    // Up side can be changed if it's the first row
-                    if (i == 0) changeable.add(2);
-                    // Down side can be changed if it's the last row
-                    if (i == gridSize - 1) changeable.add(3);
-                    
-                    if (!changeable.isEmpty()) {
-                        // Pick a random side that can be changed
-                        int side = changeable.get(random.nextInt(changeable.size()));
-                        switch (side) {
-                            case 0: currentCell.setLeft(CellComponents.APERTURE); break;
-                            case 1: currentCell.setRight(CellComponents.APERTURE); break;
-                            case 2: currentCell.setUp(CellComponents.APERTURE); break;
-                            case 3: currentCell.setDown(CellComponents.APERTURE); break;
-                        }
-                    } else {
-                        // If no sides can be changed without breaking consistency,
-                        // we're in the middle of the grid. Let's change the right side
-                        // but we'll also need to update the cell to the right
-                        currentCell.setRight(CellComponents.APERTURE);
-                        if (j < gridSize - 1) {
-                            rows.get(i).getCellAtIndex(j+1).setLeft(CellComponents.APERTURE);
-                        }
-                    }
-                }
+	            // Set right edge to WALL
+	            if (j == gridSize - 1) {
+	                currentCell.setRight(CellComponents.WALL);
+	            } else {
+	                // Randomly set RIGHT (will be shared with cell to the right)
+	                currentCell.setRight(random.nextInt(2) == 0 ? CellComponents.WALL : CellComponents.APERTURE);
+	            }
 	    	}
+	    }
+	    
+	    // Ensure all cells have at least one aperture
+	    
+	    // Top-left corner
+	    Cell topLeft = rows.get(0).getCellAtIndex(0);
+	    if (topLeft.getRight() == CellComponents.WALL && topLeft.getDown() == CellComponents.WALL) {
+	        // Randomly choose between right and down for aperture
+	        if (random.nextBoolean()) {
+	            topLeft.setRight(CellComponents.APERTURE);
+	            rows.get(0).getCellAtIndex(1).setLeft(CellComponents.APERTURE);
+	        } else {
+	            topLeft.setDown(CellComponents.APERTURE);
+	            rows.get(1).getCellAtIndex(0).setUp(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Top-right corner
+	    Cell topRight = rows.get(0).getCellAtIndex(gridSize - 1);
+	    if (topRight.getLeft() == CellComponents.WALL && topRight.getDown() == CellComponents.WALL) {
+	        // Randomly choose between left and down for aperture
+	        if (random.nextBoolean()) {
+	            topRight.setLeft(CellComponents.APERTURE);
+	            rows.get(0).getCellAtIndex(gridSize - 2).setRight(CellComponents.APERTURE);
+	        } else {
+	            topRight.setDown(CellComponents.APERTURE);
+	            rows.get(1).getCellAtIndex(gridSize - 1).setUp(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Bottom-left corner
+	    Cell bottomLeft = rows.get(gridSize - 1).getCellAtIndex(0);
+	    if (bottomLeft.getRight() == CellComponents.WALL && bottomLeft.getUp() == CellComponents.WALL) {
+	        // Randomly choose between right and up for aperture
+	        if (random.nextBoolean()) {
+	            bottomLeft.setRight(CellComponents.APERTURE);
+	            rows.get(gridSize - 1).getCellAtIndex(1).setLeft(CellComponents.APERTURE);
+	        } else {
+	            bottomLeft.setUp(CellComponents.APERTURE);
+	            rows.get(gridSize - 2).getCellAtIndex(0).setDown(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Bottom-right corner
+	    Cell bottomRight = rows.get(gridSize - 1).getCellAtIndex(gridSize - 1);
+	    if (bottomRight.getLeft() == CellComponents.WALL && bottomRight.getUp() == CellComponents.WALL) {
+	        // Randomly choose between left and up for aperture
+	        if (random.nextBoolean()) {
+	            bottomRight.setLeft(CellComponents.APERTURE);
+	            rows.get(gridSize - 1).getCellAtIndex(gridSize - 2).setRight(CellComponents.APERTURE);
+	        } else {
+	            bottomRight.setUp(CellComponents.APERTURE);
+	            rows.get(gridSize - 2).getCellAtIndex(gridSize - 1).setDown(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Top edge (not corners)
+	    for (int j = 1; j < gridSize - 1; j++) {
+	        Cell cell = rows.get(0).getCellAtIndex(j);
+	        if (cell.getLeft() == CellComponents.WALL && cell.getRight() == CellComponents.WALL && cell.getDown() == CellComponents.WALL) {
+	            // Create an aperture downward
+	            cell.setDown(CellComponents.APERTURE);
+	            // Update the cell below for consistency
+	            rows.get(1).getCellAtIndex(j).setUp(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Bottom edge (not corners)
+	    for (int j = 1; j < gridSize - 1; j++) {
+	        Cell cell = rows.get(gridSize - 1).getCellAtIndex(j);
+	        if (cell.getLeft() == CellComponents.WALL && cell.getRight() == CellComponents.WALL && cell.getUp() == CellComponents.WALL) {
+	            // Create an aperture upward
+	            cell.setUp(CellComponents.APERTURE);
+	            // Update the cell above for consistency
+	            rows.get(gridSize - 2).getCellAtIndex(j).setDown(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Left edge (not corners and not EXIT)
+	    for (int i = 1; i < gridSize - 1; i++) {
+	        Cell cell = rows.get(i).getCellAtIndex(0);
+	        if (cell.getUp() == CellComponents.WALL && cell.getDown() == CellComponents.WALL && cell.getRight() == CellComponents.WALL) {
+	            // Create an aperture to the right
+	            cell.setRight(CellComponents.APERTURE);
+	            // Update the cell to the right for consistency
+	            rows.get(i).getCellAtIndex(1).setLeft(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Right edge (not corners)
+	    for (int i = 1; i < gridSize - 1; i++) {
+	        Cell cell = rows.get(i).getCellAtIndex(gridSize - 1);
+	        if (cell.getUp() == CellComponents.WALL && cell.getDown() == CellComponents.WALL && cell.getLeft() == CellComponents.WALL) {
+	            // Create an aperture to the left
+	            cell.setLeft(CellComponents.APERTURE);
+	            // Update the cell to the left for consistency
+	            rows.get(i).getCellAtIndex(gridSize - 2).setRight(CellComponents.APERTURE);
+	        }
+	    }
+	    
+	    // Ensure all interior cells have at least one aperture
+	    for (int i = 1; i < gridSize - 1; i++) {
+	        for (int j = 1; j < gridSize - 1; j++) {
+	            Cell cell = rows.get(i).getCellAtIndex(j);
+	            // Count apertures
+	            int apertureCount = 0;
+	            if (cell.getUp() == CellComponents.APERTURE) apertureCount++;
+	            if (cell.getDown() == CellComponents.APERTURE) apertureCount++;
+	            if (cell.getLeft() == CellComponents.APERTURE) apertureCount++;
+	            if (cell.getRight() == CellComponents.APERTURE) apertureCount++;
+	            
+	            if (apertureCount == 0) {
+	                // Add an aperture in a random direction
+	                int direction = random.nextInt(4);
+	                switch (direction) {
+	                    case 0:
+	                        cell.setUp(CellComponents.APERTURE);
+	                        rows.get(i-1).getCellAtIndex(j).setDown(CellComponents.APERTURE);
+	                        break;
+	                    case 1:
+	                        cell.setDown(CellComponents.APERTURE);
+	                        rows.get(i+1).getCellAtIndex(j).setUp(CellComponents.APERTURE);
+	                        break;
+	                    case 2:
+	                        cell.setLeft(CellComponents.APERTURE);
+	                        rows.get(i).getCellAtIndex(j-1).setRight(CellComponents.APERTURE);
+	                        break;
+	                    case 3:
+	                        cell.setRight(CellComponents.APERTURE);
+	                        rows.get(i).getCellAtIndex(j+1).setLeft(CellComponents.APERTURE);
+	                        break;
+	                }
+	            }
+	        }
 	    }
 	    
 	    // Set one EXIT on the leftmost side
@@ -163,51 +270,48 @@ public class Game {
 		
 		switch (movement) {
 			case UP:
-				if (currentCell.getUp() == CellComponents.APERTURE && rowIndex > 0) {
-                    // Move the player up one row
-                    Row upRow = grid.getRows().get(rowIndex - 1);
-                    Cell upCell = upRow.getCells().get(cellIndex);
-                    player.setCurrentRow(upRow);
-                    player.setCurrentCell(upCell);
-                    return true;
-                }
-                break;
-                
-			case DOWN:
-                // Check if we can move down
-                if (currentCell.getDown() == CellComponents.APERTURE && rowIndex < grid.getRows().size() - 1) {
-                    // Move the player down one row
-                    Row downRow = grid.getRows().get(rowIndex + 1);
-                    Cell downCell = downRow.getCells().get(cellIndex);
-                    player.setCurrentRow(downRow);
-                    player.setCurrentCell(downCell);
-                    return true;
-                }
-                break;
-                
-			case LEFT:
-                // Check if we can move left
-                if (currentCell.getLeft() == CellComponents.APERTURE && cellIndex > 0) {
-                    // Move the player left one cell
-                    Cell leftCell = currentRow.getCells().get(cellIndex - 1);
-                    player.setCurrentCell(leftCell);
-                    return true;
-                } else if (currentCell.getLeft() == CellComponents.EXIT && cellIndex == 0) {
-                    // Player has reached the exit
-                    System.out.println("Player has escaped the maze!");
-                    return true;
-                }
-                break;
-                
-            case RIGHT:
-                // Check if we can move right
-                if (currentCell.getRight() == CellComponents.APERTURE && cellIndex < currentRow.getCells().size() - 1) {
-                    // Move the player right one cell
-                    Cell rightCell = currentRow.getCells().get(cellIndex + 1);
-                    player.setCurrentCell(rightCell);
-                    return true;
-                }
-                break;
+	            // Check if we can move up - aperture in current cell
+	            if (currentCell.getUp() == CellComponents.APERTURE) {
+	                Row upRow = grid.getRows().get(rowIndex - 1);
+	                Cell upCell = upRow.getCells().get(cellIndex);
+	                player.setCurrentRow(upRow);
+	                player.setCurrentCell(upCell);
+	                return true;
+	            }
+	            break;
+	            
+	        case DOWN:
+	            // Check if we can move down - aperture in current cell
+	            if (currentCell.getDown() == CellComponents.APERTURE) {
+	                Row downRow = grid.getRows().get(rowIndex + 1);
+	                Cell downCell = downRow.getCells().get(cellIndex);
+	                player.setCurrentRow(downRow);
+	                player.setCurrentCell(downCell);
+	                return true;
+	            }
+	            break;
+	            
+	        case LEFT:
+	            // Check if we can move left - either aperture or exit in current cell
+	            if (currentCell.getLeft() == CellComponents.APERTURE) {
+	                Cell leftCell = currentRow.getCells().get(cellIndex - 1);
+	                player.setCurrentCell(leftCell);
+	                return true;
+	            } else if (currentCell.getLeft() == CellComponents.EXIT) {
+	                // Player has reached the exit
+	                System.out.println("Player has escaped the maze!");
+	                return true;
+	            }
+	            break;
+	            
+	        case RIGHT:
+	            // Check if we can move right - aperture in current cell
+	            if (currentCell.getRight() == CellComponents.APERTURE) {
+	                Cell rightCell = currentRow.getCells().get(cellIndex + 1);
+	                player.setCurrentCell(rightCell);
+	                return true;
+	            }
+	            break;
 		}
 		
 		return false;
