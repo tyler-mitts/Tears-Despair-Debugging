@@ -20,7 +20,7 @@ public class Game {
 	}
 	
 	public Game(Grid grid) {
-		
+		this.setGrid(grid);
 	}
 	
 	public Grid createRandomGrid(int gridSize) {
